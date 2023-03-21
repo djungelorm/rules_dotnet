@@ -224,6 +224,8 @@ def collect_transitive_info(name, deps, private_deps, exports, strict_deps):
     transitive_ref = []
     direct_lib = []
     transitive_lib = []
+    direct_doc = []
+    transitive_doc = []
     direct_native = []
     transitive_native = []
     direct_data = []
@@ -263,6 +265,7 @@ def collect_transitive_info(name, deps, private_deps, exports, strict_deps):
         direct_ref.extend(assembly.refs)
         direct_analyzers.extend(assembly.analyzers)
         direct_lib.extend(assembly.libs)
+        direct_doc.extend(assembly.docs)
         direct_native.extend(assembly.native)
         direct_data.extend(assembly.data)
         direct_compile_data.extend(assembly.compile_data)
@@ -277,6 +280,7 @@ def collect_transitive_info(name, deps, private_deps, exports, strict_deps):
         # in the runfiles and if they are we remove them from the transitive runfiles.
         if NuGetInfo in dep:
             transitive_lib.append(assembly.transitive_libs)
+            transitive_doc.append(assembly.transitive_docs)
             transitive_native.append(assembly.transitive_native)
             transitive_data.append(assembly.transitive_data)
             transitive_runtime_deps.append(assembly.transitive_runtime_deps)
@@ -284,6 +288,7 @@ def collect_transitive_info(name, deps, private_deps, exports, strict_deps):
             # TODO: This might be a performance issue. See if we can do this without
             # having to iterate over the transitive files.
             lib = []
+            doc = []
             native = []
             data = []
             runtime_deps = []
@@ -291,6 +296,11 @@ def collect_transitive_info(name, deps, private_deps, exports, strict_deps):
                 if tlib.owner in direct_labels:
                     continue
                 lib.append(tlib)
+
+            for tdoc in assembly.transitive_docs.to_list():
+                if tdoc.owner in direct_labels:
+                    continue
+                doc.append(tdoc)
 
             for tnative in assembly.transitive_native.to_list():
                 if tnative.owner in direct_labels:
@@ -309,6 +319,7 @@ def collect_transitive_info(name, deps, private_deps, exports, strict_deps):
 
             transitive_runtime_deps.append(depset(runtime_deps))
             transitive_lib.append(depset(lib))
+            transitive_doc.append(depset(doc))
             transitive_native.append(depset(native))
             transitive_data.append(depset(data))
 
@@ -338,6 +349,7 @@ def collect_transitive_info(name, deps, private_deps, exports, strict_deps):
         depset(direct = direct_ref, transitive = transitive_ref),
         depset(direct = direct_analyzers, transitive = transitive_analyzers),
         depset(direct = direct_lib, transitive = transitive_lib),
+        depset(direct = direct_doc, transitive = transitive_doc),
         depset(direct = direct_native, transitive = transitive_native),
         depset(direct = direct_data, transitive = transitive_data),
         depset(direct = direct_compile_data, transitive = transitive_compile_data),

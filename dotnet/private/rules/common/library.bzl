@@ -27,6 +27,7 @@ def build_library(ctx, compile_action):
             files = dotnet_assembly_info_provider.data,
             transitive_files = depset(transitive = [
                 dotnet_assembly_info_provider.transitive_libs,
+                dotnet_assembly_info_provider.transitive_docs,
                 dotnet_assembly_info_provider.transitive_native,
                 dotnet_assembly_info_provider.transitive_data,
             ]),

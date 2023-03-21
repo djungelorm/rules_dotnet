@@ -152,7 +152,7 @@ def build_binary(ctx, compile_action):
         executable = launcher,
         runfiles = ctx.runfiles(
             files = direct_runfiles,
-            transitive_files = depset(transitive = [result.transitive_libs, result.transitive_native, result.transitive_data]),
+            transitive_files = depset(transitive = [result.transitive_libs, result.transitive_docs, result.transitive_native, result.transitive_data]),
         ),
         files = depset(default_info_files),
     )

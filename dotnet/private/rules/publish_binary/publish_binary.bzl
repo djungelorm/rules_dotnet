@@ -112,8 +112,13 @@ def _copy_to_publish(ctx, runtime_identifier, publish_binary_info, binary_info, 
 
     _copy_file(script_body, binary_info.app_host, app_host_copy, is_windows = is_windows)
 
-    # All managed DLLs are copied next to the app host in the publish directory
-    for file in assembly_info.libs + assembly_info.transitive_libs.to_list():
+    # All managed DLLs and XML docs are copied next to the app host in the publish directory
+    for file in (
+        assembly_info.libs +
+        assembly_info.docs +
+        assembly_info.transitive_libs.to_list() +
+        assembly_info.transitive_docs.to_list()
+    ):
         output = ctx.actions.declare_file(
             "{}/publish/{}/{}".format(ctx.label.name, runtime_identifier, file.basename),
         )

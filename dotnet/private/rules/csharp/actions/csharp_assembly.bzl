@@ -121,6 +121,7 @@ def AssemblyAction(
         prefs,
         analyzers,
         transitive_libs,
+        transitive_docs,
         transitive_native,
         transitive_data,
         transitive_compile_data,
@@ -146,6 +147,7 @@ def AssemblyAction(
     out_iref = None
     out_ref = actions.declare_file("%s/ref/%s.%s" % (out_dir, assembly_name, out_ext))
     out_pdb = actions.declare_file("%s/%s.pdb" % (out_dir, assembly_name))
+    out_doc = actions.declare_file("%s/%s.xml" % (out_dir, assembly_name))
 
     if len(internals_visible_to) == 0:
         _compile(
@@ -177,6 +179,7 @@ def AssemblyAction(
             out_dll = out_dll,
             out_ref = out_ref,
             out_pdb = out_pdb,
+            out_doc = out_doc,
         )
     else:
         # If the user is using internals_visible_to generate an additional
@@ -219,6 +222,7 @@ def AssemblyAction(
             out_ref = out_iref,
             out_dll = out_dll,
             out_pdb = out_pdb,
+            out_doc = out_doc,
         )
 
         # Generate a ref-only DLL without internals
@@ -251,6 +255,7 @@ def AssemblyAction(
             out_dll = None,
             out_ref = out_ref,
             out_pdb = None,
+            out_doc = None,
         )
 
     return DotnetAssemblyInfo(
@@ -259,17 +264,19 @@ def AssemblyAction(
         project_sdk = project_sdk,
         libs = [out_dll],
         pdbs = [out_pdb] if out_pdb else [],
+        docs = [out_doc] if out_doc else [],
         refs = [out_ref],
         irefs = [out_iref] if out_iref else [out_ref],
         analyzers = [],
         internals_visible_to = internals_visible_to or [],
-        data = data,
+        data = data + [out_doc],
         compile_data = compile_data,
         native = [],
         exports = exports_files,
         transitive_refs = prefs,
         transitive_analyzers = analyzers,
         transitive_libs = transitive_libs,
+        transitive_docs = transitive_docs,
         transitive_native = transitive_native,
         transitive_data = transitive_data,
         transitive_compile_data = transitive_compile_data,
@@ -305,7 +312,8 @@ def _compile(
         warning_level,
         out_dll = None,
         out_ref = None,
-        out_pdb = None):
+        out_pdb = None,
+        out_doc = None):
     # Our goal is to match msbuild as much as reasonable
     # https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/compiler-options/listed-alphabetically
     args = actions.args()
@@ -353,7 +361,8 @@ def _compile(
         args.add("/out:" + out_dll.path)
         args.add("/refout:" + out_ref.path)
         args.add("/pdb:" + out_pdb.path)
-        outputs = [out_dll, out_ref, out_pdb]
+        args.add("/doc:" + out_doc.path)
+        outputs = [out_dll, out_ref, out_pdb, out_doc]
     else:
         args.add("/refonly")
         args.add("/out:" + out_ref.path)
