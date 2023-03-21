@@ -440,6 +440,7 @@ def generate_warning_args(
         args.add("/warnaserror+")
         for warning in warnings_not_as_errors:
             args.add("/warnaserror-:{}".format(warning))
+            args.add("/nowarn:{}".format(warning))
     else:
         if len(warnings_not_as_errors) > 0:
             fail("Cannot use warnings_not_as_errors if treat_warnings_as_errors is not set")
